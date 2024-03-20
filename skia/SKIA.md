@@ -98,11 +98,7 @@ The SkPDF backend uses SkDocument instead of SkSurface. So in this case, you dra
 Here is an concrete example of using Skia’s PDF backend (SkPDF) via the SkDocument and SkCanvas APIs.
 
 ```cpp
-    void WritePDF(SkWStream* outputStream,
-              const char* documentTitle,
-              void (*writePage)(SkCanvas*, int page),
-              int numberOfPages,
-              SkSize pageSize) {
+void WritePDF(SkWStream* outputStream, const char* documentTitle, void (*writePage)(SkCanvas*, int page), int numberOfPages, SkSize pageSize) {
     SkPDF::Metadata metadata;
     metadata.fTitle = documentTitle;
     metadata.fCreator = "Example WritePDF() Function";
@@ -193,7 +189,7 @@ Next, I would summarize some combination methods based on my observations.
 
 Stacking means that in a canvas, after drawing one graphic, the next graphic is drawn, and so on, with no relationship between the graphics. The following is a concrete example:
 
-```
+```cpp
 void draw(SkCanvas* canvas) {
     canvas->drawColor(SK_ColorWHITE);
 
