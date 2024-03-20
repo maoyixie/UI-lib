@@ -44,13 +44,13 @@ void draw(SkCanvas* canvas) {
 }
 ```
 
-There are 6 types of effects that can be assigned to a paint: <a name="SkPathEffect"></a>SkPathEffect, <a name="SkRasterizer"></a>SkRasterizer, <a name="SkMaskFilter"></a>, <a name="SkShader"></a>, <a name="SkColorFilter"></a> and <a name="SkBlendMode"></a>. Besides, SkPaint supports to draw and measure text.
+There are 6 types of effects that can be assigned to a paint: [SkPathEffect](#SkPathEffect), [SkRasterizer](#SkRasterizer), <a name="SkMaskFilter"></a>, <a name="SkShader"></a>, <a name="SkColorFilter"></a> and <a name="SkBlendMode"></a>. Besides, SkPaint supports to draw and measure text.
 
-### [SkPathEffect](#SkPathEffect)
+### SkPathEffect
 
 Modifications to the geometry (path) before it generates an alpha mask (e.g. dashing). TODO...
 
-### [SkRasterizer](#SkRasterizer)
+### SkRasterizer
 
 Composing custom mask layers (e.g. shadows). TODO...
 
