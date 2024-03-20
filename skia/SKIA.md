@@ -1,4 +1,4 @@
-In this document, I would introduce how to use Skia based on my understanding. Firstly, I would necessary modules/classes in Skia. Then, I would present the fundamental workflow of Skia, other usages for some specific scenarios.
+In this document, targeting cpp APIs, I would introduce how to use Skia based on my understanding. Firstly, I would necessary modules/classes in Skia. Then, I would present the fundamental workflow of Skia, other usages for some specific scenarios.
 
 # Modules/Classes
 
@@ -48,54 +48,133 @@ There are 6 types of effects that can be assigned to a paint: <a name="SkPathEff
 
 ### [SkPathEffect](#SkPathEffect)
 
-TODO
+Modifications to the geometry (path) before it generates an alpha mask (e.g. dashing). TODO...
 
 ### [SkRasterizer](#SkRasterizer)
 
-TODO
+Composing custom mask layers (e.g. shadows). TODO...
 
 ### [SkMaskFilter](#SkMaskFilter)
 
-TODO
+Modifications to the alpha mask before it is colorized and drawn (e.g. blur). TODO...
 
 ### [SkShader](#SkShader)
 
-TODO
+Gradients (linear, radial, sweep), bitmap patterns (clamp, repeat, mirror), etc. TODO...
 
 ### [SkColorFilter](#SkColorFilter)
 
-TODO
+Modify the source color(s) before applying the blend (e.g. color matrix). TODO...
 
 ### [SkBlendMode](#SkBlendMode)
 
-TODO
+Porter-duff transfermodes, blend modes. TODO...
 
 # [Backends](#backends)
 
+Skia has multiple backends which receive SkCanvas drawing commands. Each backend has a unique way of creating a SkCanvas.
+
 ## Raster
 
-TODO
+The raster backend draws to a block of memory. This memory can be managed by Skia or by the client. TODO...
 
 ## GPU
 
-TODO
+GPU Surfaces must have a GrContext object which manages the GPU context, and related caches for textures and fonts. TODO...
 
 ## SkPDF
 
-TODO
+The SkPDF backend uses SkDocument instead of SkSurface. So in this case, you draw in a document-based canvas. The general process of using SkPDF is as follows:
+
+```
+    Create a document, specifying a stream to store the output.
+    For each "page" of content:
+        canvas = doc->beginPage(...)
+        draw_my_content(canvas);
+        doc->endPage();
+    Close the document with doc->close().
+```
+
+Here is an concrete example of using Skia’s PDF backend (SkPDF) via the SkDocument and SkCanvas APIs.
+
+```cpp
+    void WritePDF(SkWStream* outputStream,
+              const char* documentTitle,
+              void (*writePage)(SkCanvas*, int page),
+              int numberOfPages,
+              SkSize pageSize) {
+    SkPDF::Metadata metadata;
+    metadata.fTitle = documentTitle;
+    metadata.fCreator = "Example WritePDF() Function";
+    metadata.fCreation = {0, 2019, 1, 4, 31, 12, 34, 56};
+    metadata.fModified = {0, 2019, 1, 4, 31, 12, 34, 56};
+    auto pdfDocument = SkPDF::MakeDocument(outputStream, metadata);
+    SkASSERT(pdfDocument);
+    for (int page = 0; page < numberOfPages; ++page) {
+        SkCanvas* pageCanvas = pdfDocument->beginPage(pageSize.width(), pageSize.height());
+        writePage(pageCanvas, page);
+        pdfDocument->endPage();
+    }
+    pdfDocument->close();
+}
+
+// Print binary data to stdout as hex.
+void print_data(const SkData* data, const char* name) {
+    if (data) {
+        SkDebugf("\nxxd -r -p > %s << EOF", name);
+        size_t s = data->size();
+        const uint8_t* d = data->bytes();
+        for (size_t i = 0; i < s; ++i) {
+            if (i % 40 == 0) { SkDebugf("\n"); }
+            SkDebugf("%02x", d[i]);
+        }
+        SkDebugf("\nEOF\n\n");
+    }
+}
+
+// example function that draws on a SkCanvas.
+void write_page(SkCanvas* canvas, int) {
+    const SkScalar R = 115.2f, C = 128.0f;
+    SkPath path;
+    path.moveTo(C + R, C);
+    for (int i = 1; i < 8; ++i) {
+        SkScalar a = 2.6927937f * i;
+        path.lineTo(C + R * cos(a), C + R * sin(a));
+    }
+    SkPaint paint;
+    paint.setStyle(SkPaint::kStroke_Style);
+    canvas->drawPath(path, paint);
+}
+
+void draw(SkCanvas*) {
+    constexpr SkSize ansiLetterSize{8.5f * 72, 11.0f * 72};
+    SkDynamicMemoryWStream buffer;
+    WritePDF(&buffer, "SkPDF Example", &write_page, 1, ansiLetterSize);
+    sk_sp<SkData> pdfData = buffer.detachAsData();
+    print_data(pdfData.get(), "skpdf_example.pdf");
+}
+```
 
 ## SkPicture
 
-TODO
+The SkPicture backend uses SkPictureRecorder instead of SkSurface. TODO...
 
 ## NullCanvas
 
-TODO
+The NullCanvas is a canvas that ignores all drawing commands and does nothing. TODO...
 
 ## SkXPS
 
-TODO
+The SkXPS(still experimental) canvas writes into an XPS document. TODO...
 
 ## SkSVG
 
-TODO
+The SkSVG(still experimental) canvas writes into an SVG document. TODO...
+
+# SkSL
+
+# Runtime Effects
+
+# Workflow
+
+## Basic/Fundamental
