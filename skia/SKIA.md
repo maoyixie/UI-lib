@@ -1,4 +1,4 @@
-In this document, targeting cpp APIs, I would introduce how to use Skia based on my understanding. Firstly, I would necessary modules/classes in Skia. Then, I would present the fundamental workflow of Skia, other usages for some specific scenarios.
+In this document, targeting cpp APIs, I would introduce how to use Skia based on my understanding. Firstly, I would introduce necessary modules/classes in Skia. Then, I would present the fundamental workflow of Skia, other usages for some specific scenarios.
 
 # Modules/Classes
 
@@ -70,19 +70,19 @@ Modify the source color(s) before applying the blend (e.g. color matrix). TODO..
 
 Porter-duff transfermodes, blend modes. TODO...
 
-# [Backends](#backends)
+## [Backends](#backends)
 
 Skia has multiple backends which receive SkCanvas drawing commands. Each backend has a unique way of creating a SkCanvas.
 
-## Raster
+### Raster
 
 The raster backend draws to a block of memory. This memory can be managed by Skia or by the client. TODO...
 
-## GPU
+### GPU
 
 GPU Surfaces must have a GrContext object which manages the GPU context, and related caches for textures and fonts. TODO...
 
-## SkPDF
+### SkPDF
 
 The SkPDF backend uses SkDocument instead of SkSurface. So in this case, you draw in a document-based canvas. The general process of using SkPDF is as follows:
 
@@ -151,25 +151,29 @@ void draw(SkCanvas*) {
 }
 ```
 
-## SkPicture
+### SkPicture
 
 The SkPicture backend uses SkPictureRecorder instead of SkSurface. TODO...
 
-## NullCanvas
+### NullCanvas
 
 The NullCanvas is a canvas that ignores all drawing commands and does nothing. TODO...
 
-## SkXPS
+### SkXPS
 
 The SkXPS(still experimental) canvas writes into an XPS document. TODO...
 
-## SkSVG
+### SkSVG
 
 The SkSVG(still experimental) canvas writes into an SVG document. TODO...
 
-# SkSL
+## SkSL
 
-# Runtime Effects
+TODO...
+
+## Runtime Effects
+
+TODO...
 
 # Workflow
 
