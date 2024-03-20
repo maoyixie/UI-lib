@@ -1,4 +1,4 @@
-In this document, targeting cpp APIs, I would introduce how to use Skia based on my understanding. Firstly, I would introduce necessary modules/classes in Skia. Then, I would present the fundamental workflow of Skia, other usages for some specific scenarios.
+In this document, targeting cpp APIs, I would introduce how to use Skia based on my understanding. Firstly, I would introduce necessary [modules/classes](#modulesclasses) in Skia. Then, I would present the fundamental [workflow](#workflow) of Skia and other usages for some specific scenarios.
 
 # Modules/Classes
 
@@ -17,7 +17,7 @@ path.quadTo(66, 188, 120, 136); //add quadratic Bézier curve from last point (3
 
 ## SkCanvas
 
-Class SkCanvas provides an interface for drawing, which is the drawing context for Skia. However, it does not store any other drawing attributes in the context (e.g. color, pen size). Rather, these are specified explicitly in each draw call, via a SkPaint. There are multiple backends<a name="backends"></a> to create SkCanvas.
+Class SkCanvas provides an interface for drawing, which is the drawing context for Skia. However, it does not store any other drawing attributes in the context (e.g. color, pen size). Rather, these are specified explicitly in each draw call, via a SkPaint. There are multiple [backends](#Backends) to create SkCanvas.
 
 ## SkPaint
 
@@ -44,7 +44,7 @@ void draw(SkCanvas* canvas) {
 }
 ```
 
-There are 6 types of effects that can be assigned to a paint: [SkPathEffect](#SkPathEffect), [SkRasterizer](#SkRasterizer), <a name="SkMaskFilter"></a>, <a name="SkShader"></a>, <a name="SkColorFilter"></a> and <a name="SkBlendMode"></a>. Besides, SkPaint supports to draw and measure text.
+There are 6 types of effects that can be assigned to a paint: [SkPathEffect](#skpatheffect), [SkRasterizer](#skrasterizer), [SkMaskFilter](#skmaskfilter), [SkShader](#skshader), [SkColorFilter](#skcolorfilter) and [SkBlendMode](#skblendmode). Besides, SkPaint supports to draw and measure text.
 
 ### SkPathEffect
 
@@ -54,23 +54,23 @@ Modifications to the geometry (path) before it generates an alpha mask (e.g. das
 
 Composing custom mask layers (e.g. shadows). TODO...
 
-### [SkMaskFilter](#SkMaskFilter)
+### SkMaskFilter
 
 Modifications to the alpha mask before it is colorized and drawn (e.g. blur). TODO...
 
-### [SkShader](#SkShader)
+### SkShader
 
 Gradients (linear, radial, sweep), bitmap patterns (clamp, repeat, mirror), etc. TODO...
 
-### [SkColorFilter](#SkColorFilter)
+### SkColorFilter
 
 Modify the source color(s) before applying the blend (e.g. color matrix). TODO...
 
-### [SkBlendMode](#SkBlendMode)
+### SkBlendMode
 
 Porter-duff transfermodes, blend modes. TODO...
 
-## [Backends](#backends)
+## Backends
 
 Skia has multiple backends which receive SkCanvas drawing commands. Each backend has a unique way of creating a SkCanvas.
 
