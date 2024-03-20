@@ -1,6 +1,45 @@
-In this document, targeting cpp APIs, I would introduce how to use Skia based on my understanding. Firstly, I would introduce necessary [modules/classes](#modulesclasses) in Skia. Then, I would present the fundamental [workflow](#workflow) of Skia and other usages for some specific scenarios.
+In this document, targeting cpp APIs, I would introduce how to use Skia based on my understanding. Firstly, I would present the fundamental [workflow](#workflow) of Skia. Then, I would deeply illustrate the necessary [module/class](#moduleclass) in Skia. Finally, I would summarize the drawing [model](#model) from the perspective of APIs interaction.
 
-# Modules/Classes
+# WORKFLOW
+
+The basic/fundamental workflow is that:
+
+```
+(initialize canvas) => set parameters => draw
+```
+
+- Initialize canvas: You can call canvas->save(), canvas->clear(SkColor) or canvas->drawColor(Sk_ColorWHITE) to initialize the canvas. Do remember to call canvas->restore() at the end if you call canvas->save() at the beginning. You can also do nothing.
+- Set parameters:
+  - Define graphic: You can use SkPath or SkXXX (e.g. SkRect).
+  - Configure other parameters: You can use SkPaint. There are a lot of other settings.
+- Draw: You can call canvas->drawPath() or canvas->drawXXX().
+
+Here are two simple examples:
+
+```cpp
+void draw(SkCanvas* canvas) {
+    canvas->drawColor(SK_ColorWHITE);
+    SkPaint paint;
+    paint.setAntiAlias(true);
+    SkPath path;
+    path.moveTo(124, 108);
+    path.lineTo(172, 24);
+    canvas->drawPath(path, paint);
+}
+```
+
+```cpp
+void draw(SkCanvas* canvas) {
+    canvas->save();
+    SkRect rect = SkRect::MakeXYWH(-90.5f, -90.5f, 181.0f, 181.0f);
+    SkPaint paint;
+    paint.setColor(SK_ColorBLUE);
+    canvas->drawRect(rect, paint);
+    canvas->restore();
+}
+```
+
+# MODULE/CLASS
 
 ## SkPath
 
@@ -175,19 +214,7 @@ TODO...
 
 TODO...
 
-# Workflow
-
-The basic/fundamental workflow is that:
-
-```
-initialize canvas => set parameters => draw
-```
-
-- Initialize canvas: You can call canvas->save(), canvas->clear(SkColor) or canvas->drawColor(Sk_ColorWHITE) to initialize the canvas. Do remember to call canvas->restore() at the end if you call canvas->save() at the beginning.
-- Set parameters: You can only call SkPaint without regarding to SkPath, etc.
-- Draw: canvas->drawXXX().
-
-Next, I would summarize some combination methods based on my observations.
+# MODEL
 
 ## Stacking
 
