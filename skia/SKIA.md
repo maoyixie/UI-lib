@@ -177,4 +177,59 @@ The SkSVG(still experimental) canvas writes into an SVG document. TODO...
 
 # Workflow
 
-## Basic/Fundamental
+The basic/fundamental workflow is that:
+
+```
+initialize canvas => set parameters => draw
+```
+
+- Initialize canvas: You can call canvas->save(), canvas->clear(SkColor) or canvas->drawColor(Sk_ColorWHITE) to initialize the canvas. Do remember to call canvas->restore() at the end if you call canvas->save() at the beginning.
+- Set parameters: You can only call SkPaint without regarding to SkPath, etc.
+- Draw: canvas->drawXXX().
+
+Next, I would summarize some combination methods based on my observations.
+
+## Stacking
+
+Stacking means that in a canvas, after drawing one graphic, the next graphic is drawn, and so on, with no relationship between the graphics. The following is a concrete example:
+
+```
+void draw(SkCanvas* canvas) {
+    canvas->drawColor(SK_ColorWHITE);
+
+    SkPaint paint;
+    paint.setStyle(SkPaint::kStroke_Style);
+    paint.setStrokeWidth(4);
+    paint.setColor(SK_ColorRED);
+
+    SkRect rect = SkRect::MakeXYWH(50, 50, 40, 60);
+    canvas->drawRect(rect, paint);
+
+    SkRRect oval;
+    oval.setOval(rect);
+    oval.offset(40, 60);
+    paint.setColor(SK_ColorBLUE);
+    canvas->drawRRect(oval, paint);
+
+    paint.setColor(SK_ColorCYAN);
+    canvas->drawCircle(180, 50, 25, paint);
+
+    rect.offset(80, 0);
+    paint.setColor(SK_ColorYELLOW);
+    canvas->drawRoundRect(rect, 10, 10, paint);
+
+    SkPath path;
+    path.cubicTo(768, 0, -512, 256, 256, 256);
+    paint.setColor(SK_ColorGREEN);
+    canvas->drawPath(path, paint);
+
+    canvas->drawImage(image, 128, 128, SkSamplingOptions(), &paint);
+
+    SkRect rect2 = SkRect::MakeXYWH(0, 0, 40, 60);
+    canvas->drawImageRect(image, rect2, SkSamplingOptions(), &paint);
+
+    SkPaint paint2;
+    auto text = SkTextBlob::MakeFromString("Hello, Skia!", SkFont(nullptr, 18));
+    canvas->drawTextBlob(text.get(), 50, 25, paint2);
+}
+```
