@@ -103,8 +103,7 @@ SkPath star() {
 
 void draw(SkCanvas* canvas) {
     SkPaint paint;
-    paint.setPathEffect(SkPathEffect::MakeSum(SkDiscretePathEffect::Make(10.0f, 4.0f),
-                                              SkDiscretePathEffect::Make(10.0f, 4.0f, 1245u)));
+    paint.setPathEffect(SkPathEffect::MakeSum(SkDiscretePathEffect::Make(10.0f, 4.0f), SkDiscretePathEffect::Make(10.0f, 4.0f, 1245u)));
     paint.setStyle(SkPaint::kStroke_Style);
     paint.setStrokeWidth(2.0f);
     paint.setAntiAlias(true);
@@ -116,7 +115,7 @@ void draw(SkCanvas* canvas) {
 
 ### SkRasterizer
 
-Composing custom mask layers (e.g. shadows). TODO...
+Composing custom mask layers (e.g. shadows). Seems to related to GPU, little information. TODO...
 
 ### SkMaskFilter
 
