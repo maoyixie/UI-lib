@@ -119,7 +119,17 @@ Composing custom mask layers (e.g. shadows). Seems to related to GPU, little inf
 
 ### SkMaskFilter
 
-Modifications to the alpha mask before it is colorized and drawn (e.g. blur). TODO...
+Modifications to the alpha mask before it is colorized and drawn (e.g. blur). Here is an example:
+
+```cpp
+void draw(SkCanvas* canvas) {
+    canvas->drawColor(SkColorSetARGB(0xFF, 0xFF, 0xFF, 0xFF));
+    SkPaint paint;
+    paint.setMaskFilter(SkMaskFilter::MakeBlur(kNormal_SkBlurStyle, 5.0f));
+    sk_sp<SkTextBlob> blob = SkTextBlob::MakeFromString("Skia", SkFont(nullptr, 120));
+    canvas->drawTextBlob(blob.get(), 0, 160, paint);
+}
+```
 
 ### SkShader
 
@@ -232,7 +242,7 @@ The SkSVG(still experimental) canvas writes into an SVG document. TODO...
 
 ## SkSL
 
-TODO...
+Shading language. TODO...
 
 ## Runtime Effects
 
