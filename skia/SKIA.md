@@ -83,7 +83,7 @@ void draw(SkCanvas* canvas) {
 }
 ```
 
-There are 6 types of effects that can be assigned to a paint: [SkPathEffect](#skpatheffect), [SkRasterizer](#skrasterizer), [SkMaskFilter](#skmaskfilter), [SkShader](#skshader), [SkColorFilter](#skcolorfilter) and [SkBlendMode](#skblendmode). Besides, SkPaint supports to draw and measure text.
+There are 6 types of effects that can be assigned to a paint: [SkPathEffect](#skpatheffect), [SkRasterizer](#skrasterizer), [SkMaskFilter](#skmaskfilter), [SkShader](#skshader), [SkColorFilter](#skcolorfilter) and [SkBlendMode](#skblendmode). Besides, SkPaint supports to draw and measure text. The following are detailed illustrations to the 6 types of effects.
 
 ### SkPathEffect
 
@@ -111,7 +111,7 @@ Porter-duff transfermodes, blend modes. TODO...
 
 ## Backends
 
-Skia has multiple backends which receive SkCanvas drawing commands. Each backend has a unique way of creating a SkCanvas.
+Skia has multiple backends which receive SkCanvas drawing commands. Each backend has a unique way of creating a SkCanvas. The following are comprehensive explanations of various backends.
 
 ### Raster
 
@@ -215,6 +215,8 @@ TODO...
 TODO...
 
 # MODEL
+
+From the standpoint of APIs interaction, I provide a recap of the drawing models.
 
 ## Stacking
 
