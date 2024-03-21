@@ -107,7 +107,7 @@ Modify the source color(s) before applying the blend (e.g. color matrix). TODO..
 
 ### SkBlendMode
 
-Porter-duff transfermodes, blend modes. TODO...
+As for enum class SkBlendMode, blends are operators that take in two colors (source, destination) and return a new color. For enum class SkBlendModeCoeff, these coefficients describe the blend equation used.
 
 ## Backends
 
