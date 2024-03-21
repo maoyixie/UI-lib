@@ -87,7 +87,32 @@ There are 6 types of effects that can be assigned to a paint: [SkPathEffect](#sk
 
 ### SkPathEffect
 
-Modifications to the geometry (path) before it generates an alpha mask (e.g. dashing). TODO...
+Class SkPathEffect modifies/affects the geometry (path) of a drawing primitive before it is transformed by the canvas' matrix and drawn. Here is an example:
+
+```cpp
+SkPath star() {
+    const SkScalar R = 115.2f, C = 128.0f;
+    SkPath path;
+    path.moveTo(C + R, C);
+    for (int i = 1; i < 8; ++i) {
+        SkScalar a = 2.6927937f * i;
+        path.lineTo(C + R * cos(a), C + R * sin(a));
+    }
+    return path;
+}
+
+void draw(SkCanvas* canvas) {
+    SkPaint paint;
+    paint.setPathEffect(SkPathEffect::MakeSum(SkDiscretePathEffect::Make(10.0f, 4.0f),
+                                              SkDiscretePathEffect::Make(10.0f, 4.0f, 1245u)));
+    paint.setStyle(SkPaint::kStroke_Style);
+    paint.setStrokeWidth(2.0f);
+    paint.setAntiAlias(true);
+    canvas->clear(SK_ColorWHITE);
+    SkPath path(star());
+    canvas->drawPath(path, paint);
+}
+```
 
 ### SkRasterizer
 
@@ -107,7 +132,7 @@ Modify the source color(s) before applying the blend (e.g. color matrix). TODO..
 
 ### SkBlendMode
 
-As for enum class SkBlendMode, blends are operators that take in two colors (source, destination) and return a new color. For enum class SkBlendModeCoeff, these coefficients describe the blend equation used.
+As for enum class SkBlendMode, blends are operators that take in two colors (source, destination) and return a new color. For enum class SkBlendModeCoeff, aka Porter-Duff SkBlendModes, these coefficients describe the blend equation used.
 
 ## Backends
 
