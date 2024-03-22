@@ -303,8 +303,9 @@ Previously, GPU Surfaces must have a **GrContext** object which manages the GPU 
 void gl_example(int width, int height, void (*draw)(SkCanvas*), const char* path) {
     // You've already created your OpenGL context and bound it.
     sk_sp<const GrGLInterface> interface = nullptr;
-    /* Leaving interface as null makes Skia extract pointers to OpenGL functions for the current context in a platform-specific way. Alternatively,
-    you may create your own GrGLInterface and initialize it however you like to attach to an alternate OpenGL implementation or intercept Skia's OpenGL calls. */
+    /* Leaving interface as null makes Skia extract pointers to OpenGL functions for the current context in
+    a platform-specific way. Alternatively, you may create your own GrGLInterface and initialize it
+    however you like to attach to an alternate OpenGL implementation or intercept Skia's OpenGL calls. */
     sk_sp<GrDirectContext> context = GrDirectContexts::MakeGL(interface);
     SkImageInfo info = SkImageInfo:: MakeN32Premul(width, height);
     sk_sp<SkSurface> gpuSurface(SkSurface::MakeRenderTarget(context.get(), skgpu::Budgeted::kNo, info));
