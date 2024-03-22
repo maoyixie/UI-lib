@@ -2,14 +2,14 @@ In this document, targeting cpp APIs, I would introduce how to use Skia based on
 
 # WORKFLOW
 
-The basic/fundamental workflow is that:
+The fundamental workflow is that:
 
 ```
 determine backends => get/create canvas => (initialize) => set parameters => draw
 ```
 
-- Determine backends: TODO...
-- Get/Create canvas: TODO...
+- Determine [backends](#backends): TODO...
+- Get/Create [canvas](#skcanvas): TODO...
 - Initialize: You can call canvas->save(), canvas->clear(SkColor) or canvas->drawColor(Sk_ColorWHITE) to initialize the canvas. Do remember to call canvas->restore() at the end if you call canvas->save() at the beginning. You can also do nothing.
 - Set parameters:
   - Define graphic: You can use SkPath or SkXXX (e.g. SkRect).
