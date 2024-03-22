@@ -5,10 +5,12 @@ In this document, targeting cpp APIs, I would introduce how to use Skia based on
 The basic/fundamental workflow is that:
 
 ```
-(initialize canvas) => set parameters => draw
+determine backends => get/create canvas => (initialize) => set parameters => draw
 ```
 
-- Initialize canvas: You can call canvas->save(), canvas->clear(SkColor) or canvas->drawColor(Sk_ColorWHITE) to initialize the canvas. Do remember to call canvas->restore() at the end if you call canvas->save() at the beginning. You can also do nothing.
+- Determine backends: TODO...
+- Get/Create canvas: TODO...
+- Initialize: You can call canvas->save(), canvas->clear(SkColor) or canvas->drawColor(Sk_ColorWHITE) to initialize the canvas. Do remember to call canvas->restore() at the end if you call canvas->save() at the beginning. You can also do nothing.
 - Set parameters:
   - Define graphic: You can use SkPath or SkXXX (e.g. SkRect).
   - Configure other parameters: You can use SkPaint. There are a lot of other settings.
@@ -242,7 +244,44 @@ Skia has multiple backends which receive SkCanvas drawing commands. Each backend
 
 ### Raster
 
-The raster backend draws to a block of memory. This memory can be managed by Skia or by the client. TODO...
+The raster backend draws to a block of memory. This memory can be managed by Skia or by the client. The recommended way of creating a canvas for the Raster and Ganesh backends is to use a SkSurface, which is an object that manages the memory into which the canvas commands are drawn. Here is an example:
+
+```cpp
+#include "include/core/SkData.h"
+#include "include/core/SkImage.h"
+#include "include/core/SkStream.h"
+#include "include/core/SkSurface.h"
+void raster(int width, int height, void (*draw)(SkCanvas*), const char* path) {
+    sk_sp<SkSurface> rasterSurface = SkSurface::MakeRasterN32Premul(width, height);
+    SkCanvas* rasterCanvas = rasterSurface->getCanvas();
+    draw(rasterCanvas);
+    sk_sp<SkImage> img(rasterSurface->makeImageSnapshot());
+    if (!img) { return; }
+    sk_sp<SkData> png = SkPngEncoder::Encode(nullptr, img, {});
+    if (!png) { return; }
+    SkFILEWStream out(path);
+    (void)out.write(png->data(), png->size());
+}
+```
+
+Alternatively, we could have specified the memory for the surface explicitly, instead of asking Skia to manage it. Here is an example:
+
+```cpp
+#include <vector>
+#include "include/core/SkSurface.h"
+std::vector<char> raster_direct(int width, int height, void (*draw)(SkCanvas*)) {
+    SkImageInfo info = SkImageInfo::MakeN32Premul(width, height);
+    size_t rowBytes = info.minRowBytes();
+    size_t size = info.getSafeSize(rowBytes);
+    std::vector<char> pixelMemory(size);  // allocate memory
+    sk_sp<SkSurface> surface = SkSurface::MakeRasterDirect(info, &pixelMemory[0], rowBytes);
+    SkCanvas* canvas = surface->getCanvas();
+    draw(canvas);
+    return pixelMemory;
+}
+```
+
+SkSurface is responsible for managing the pixels that a canvas draws into. The pixels can be allocated either in CPU memory (a raster surface) or on the GPU (a GrRenderTarget surface). SkSurface takes care of allocating a SkCanvas that will draw into the surface. Call surface->getCanvas() to use that canvas (but don't delete it, it is owned by the surface). SkSurface always has non-zero dimensions. If there is a request for a new surface, and either of the requested dimensions are zero, then nullptr will be returned. Clients should _not_ subclass SkSurface as there is a lot of internal machinery that is not publicly accessible.
 
 ### GPU
 
@@ -255,7 +294,7 @@ The SkPDF backend uses SkDocument instead of SkSurface. So in this case, you dra
 ```
 Create a document, specifying a stream to store the output.
 For each "page" of content:
-    canvas = doc->beginPage(...)
+    canvas = doc->beginPage(...);
     draw_my_content(canvas);
     doc->endPage();
 Close the document with doc->close().
