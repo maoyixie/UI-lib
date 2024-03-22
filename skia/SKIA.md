@@ -292,12 +292,12 @@ GPU Surfaces must have a GrContext object which manages the GPU context, and rel
 The SkPDF backend uses SkDocument instead of SkSurface. So in this case, you draw in a document-based canvas. The general process of using SkPDF is as follows:
 
 ```
-- Create a document, specifying a stream to store the output.
-- For each "page" of content:
-  - canvas = doc->beginPage(...);
-  - draw_my_content(canvas);
-  - doc->endPage();
-- Close the document with doc->close().
+Create a document, specifying a stream to store the output.
+For each "page" of content:
+    canvas = doc->beginPage(...);
+    draw_my_content(canvas);
+    doc->endPage();
+Close the document with doc->close().
 ```
 
 Here is an concrete example of using Skia’s PDF backend (SkPDF) via the SkDocument and SkCanvas APIs.
