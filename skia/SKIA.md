@@ -133,7 +133,20 @@ void draw(SkCanvas* canvas) {
 
 ### SkShader
 
-Gradients (linear, radial, sweep), bitmap patterns (clamp, repeat, mirror), etc. TODO...
+Gradients (linear, radial, sweep), bitmap patterns (clamp, repeat, mirror). Shaders specify the source color(s) for what is being drawn. If a paint has no shader, then the paint's color is used. If the paint has a shader, then the shader's color(s) are use instead. Here is an example:
+
+```cpp
+// skpaint_compose_shader
+void draw(SkCanvas* canvas) {
+    SkColor colors[2] = {SK_ColorBLUE, SK_ColorYELLOW};
+    SkPaint paint;
+    paint.setShader(SkShaders::Blend(
+            SkBlendMode::kDifference,
+            SkGradientShader::MakeRadial(SkPoint::Make(128.0f, 128.0f), 180.0f, colors, nullptr, 2, SkTileMode::kClamp, 0, nullptr),
+            SkPerlinNoiseShader::MakeTurbulence(0.025f, 0.025f, 2, 0.0f, nullptr)));
+    canvas->drawPaint(paint);
+}
+```
 
 ### SkColorFilter
 
