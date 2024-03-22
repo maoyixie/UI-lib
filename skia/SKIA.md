@@ -247,11 +247,13 @@ Skia has multiple backends which receive SkCanvas drawing commands. Each backend
 The raster backend draws to a block of memory. This memory can be managed by Skia or by the client. The recommended way of creating a canvas for the Raster and Ganesh backends is to use a SkSurface, which is an object that manages the memory into which the canvas commands are drawn. Here is an example:
 
 ```cpp
+// old version
 #include "include/core/SkData.h"
 #include "include/core/SkImage.h"
 #include "include/core/SkStream.h"
 #include "include/core/SkSurface.h"
 void raster(int width, int height, void (*draw)(SkCanvas*), const char* path) {
+    // change: SkSurface::MakeRasterN32Premul -> SkSurfaces::Raster (clients should make SkImageInfo)
     sk_sp<SkSurface> rasterSurface = SkSurface::MakeRasterN32Premul(width, height);
     SkCanvas* rasterCanvas = rasterSurface->getCanvas();
     draw(rasterCanvas);
@@ -267,6 +269,7 @@ void raster(int width, int height, void (*draw)(SkCanvas*), const char* path) {
 Alternatively, we could have specified the memory for the surface explicitly, instead of asking Skia to manage it. Here is an example:
 
 ```cpp
+// old version
 #include <vector>
 #include "include/core/SkSurface.h"
 std::vector<char> raster_direct(int width, int height, void (*draw)(SkCanvas*)) {
@@ -274,6 +277,7 @@ std::vector<char> raster_direct(int width, int height, void (*draw)(SkCanvas*)) 
     size_t rowBytes = info.minRowBytes();
     size_t size = info.getSafeSize(rowBytes);
     std::vector<char> pixelMemory(size);  // allocate memory
+    // change: SkSurface::MakeRasterDirect -> SkSurfaces::WrapPixels
     sk_sp<SkSurface> surface = SkSurface::MakeRasterDirect(info, &pixelMemory[0], rowBytes);
     SkCanvas* canvas = surface->getCanvas();
     draw(canvas);
