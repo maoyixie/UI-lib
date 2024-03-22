@@ -336,7 +336,7 @@ For each "page" of content:
 Close the document with doc->close().
 ```
 
-Here are two concrete example of using Skia’s PDF backend (SkPDF) via the SkDocument and SkCanvas APIs.
+Here is a concrete example of using Skia’s PDF backend (SkPDF) via the SkDocument and SkCanvas APIs:
 
 ```cpp
 void WritePDF(SkWStream* outputStream, const char* documentTitle, void (*writePage)(SkCanvas*, int page), int numberOfPages, SkSize pageSize) {
@@ -391,6 +391,8 @@ void draw(SkCanvas*) {
     print_data(pdfData.get(), "skpdf_example.pdf");
 }
 ```
+
+Another example:
 
 ```cpp
 #include "include/docs/SkPDFDocument.h"
