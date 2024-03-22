@@ -150,7 +150,25 @@ void draw(SkCanvas* canvas) {
 
 ### SkColorFilter
 
-Modify the source color(s) before applying the blend (e.g. color matrix). TODO...
+Modify the source color(s) before applying the blend (e.g. color matrix). ColorFilters are optional objects in the drawing pipeline. When present in a paint, they are called with the "src" colors, and return new colors, which are then passed onto the next stage (either ImageFilter or Xfermode). Here is an API in class SkColorFilter:
+
+```cpp
+// construct a colorfilter whose effect is to first apply the inner filter and then apply this filter, applied to the output of the inner filter.
+// result = this(inner(...))
+sk_sp<SkColorFilter> makeComposed(sk_sp<SkColorFilter> inner) const;
+```
+
+Some other APIs in class SkColorFilters:
+
+```cpp
+static sk_sp<SkColorFilter> Compose(const sk_sp<SkColorFilter>& outer, sk_sp<SkColorFilter> inner) {
+        return outer ? outer->makeComposed(std::move(inner)) : std::move(inner);
+}
+
+// Blends between the constant color (src) and input color (dst) based on the SkBlendMode.
+// If the color space is null, the constant color is assumed to be defined in sRGB.
+static sk_sp<SkColorFilter> Blend(const SkColor4f& c, sk_sp<SkColorSpace>, SkBlendMode mode);
+```
 
 ### SkBlendMode
 
