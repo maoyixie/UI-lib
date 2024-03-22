@@ -325,7 +325,7 @@ void gl_example(int width, int height, void (*draw)(SkCanvas*), const char* path
 
 ### SkPDF
 
-The SkPDF backend uses SkDocument instead of SkSurface. So in this case, you draw in a document-based canvas. The general process of using SkDocument is as follows:
+The SkPDF backend uses SkDocument instead of SkSurface. So in this case, you draw in a document-based canvas. The general process for using SkDocument is as follows:
 
 ```
 Create a document, specifying a stream to store the output.
@@ -416,7 +416,30 @@ The SkSVG(still experimental) canvas writes into an SVG document. Little informa
 
 ### SkPicture
 
-The SkPicture backend uses SkPictureRecorder instead of SkSurface. TODO...
+The SkPicture backend uses SkPictureRecorder instead of SkSurface. The general procedure for using SkPictureRecorder is as follows:
+
+```
+canvas = recorder.beginRecording(...);
+draw_my_content(canvas);
+result = recorder.finishRecordingAsXXX(...);
+```
+
+Here is an concrete example:
+
+```cpp
+#include "include/core/SkPictureRecorder.h"
+#include "include/core/SkPicture.h"
+#include "include/core/SkStream.h"
+void picture(int width, int height, void (*draw)(SkCanvas*), const char* path) {
+    SkPictureRecorder recorder;
+    SkCanvas* recordingCanvas = recorder.beginRecording(SkIntToScalar(width), SkIntToScalar(height));
+    draw(recordingCanvas);
+    sk_sp<SkPicture> picture = recorder.finishRecordingAsPicture();
+    SkFILEWStream skpStream(path);
+    // Open SKP files with `viewer --skps PATH_TO_SKP --slide SKP_FILE`
+    picture->serialize(&skpStream);
+}
+```
 
 ### NullCanvas
 
