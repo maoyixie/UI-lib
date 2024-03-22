@@ -289,11 +289,43 @@ SkSurface is responsible for managing the pixels that a canvas draws into. The p
 
 ### GPU
 
-GPU Surfaces must have a GrContext object which manages the GPU context, and related caches for textures and fonts. TODO...
+Previously, GPU Surfaces must have a _GrContext_ object which manages the GPU context, and related caches for textures and fonts. GrContexts are matched one to one with OpenGL contexts or Vulkan devices. That is, all SkSurfaces that will be rendered to using the same OpenGL context or Vulkan device should share a GrContext. Skia does not create a OpenGL context or Vulkan device for you. In OpenGL mode it also assumes that the correct OpenGL context has been made current to the current thread when Skia calls are made. Currently, _GrContext_ has been replaced by two separate classes: GrDirectContext which is the traditional notion of GrContext, and GrRecordingContext which is a context that is recording an SkDeferredDisplayList and therefore has reduced functionality. Unless you are using SkDeferredDisplayList, migrate directly to GrDirectContext in all cases. Here is an example:
+
+```cpp
+#include "include/gpu/GrDirectContext.h"
+#include "include/gpu/gl/GrGLInterface.h"
+#include "include/gpu/ganesh/gl/GrGLInterface.h"
+#include "include/core/SkData.h"
+#include "include/core/SkImage.h"
+#include "include/core/SkStream.h"
+#include "include/core/SkSurface.h"
+
+void gl_example(int width, int height, void (*draw)(SkCanvas*), const char* path) {
+    // You've already created your OpenGL context and bound it.
+    sk_sp<const GrGLInterface> interface = nullptr;
+    /* Leaving interface as null makes Skia extract pointers to OpenGL functions for the current context in a platform-specific way. Alternatively, you may create your own GrGLInterface and initialize it however you like to attach to an alternate OpenGL implementation or intercept Skia's OpenGL calls. */
+    sk_sp<GrDirectContext> context = GrDirectContexts::MakeGL(interface);
+    SkImageInfo info = SkImageInfo:: MakeN32Premul(width, height);
+    sk_sp<SkSurface> gpuSurface(SkSurface::MakeRenderTarget(context.get(), skgpu::Budgeted::kNo, info));
+    if (!gpuSurface) {
+        SkDebugf("SkSurface::MakeRenderTarget returned null\n");
+        return;
+    }
+    SkCanvas* gpuCanvas = gpuSurface->getCanvas();
+    draw(gpuCanvas);
+    sk_sp<SkImage> img(gpuSurface->makeImageSnapshot());
+    if (!img) { return; }
+    // Must pass non-null context so the pixels can be read back and encoded.
+    sk_sp<SkData> png = SkPngEncoder::Encode(context.get(), img, {});
+    if (!png) { return; }
+    SkFILEWStream out(path);
+    (void)out.write(png->data(), png->size());
+}
+```
 
 ### SkPDF
 
-The SkPDF backend uses SkDocument instead of SkSurface. So in this case, you draw in a document-based canvas. The general process of using SkPDF is as follows:
+The SkPDF backend uses SkDocument instead of SkSurface. So in this case, you draw in a document-based canvas. The general process of using SkDocument is as follows:
 
 ```
 Create a document, specifying a stream to store the output.
@@ -304,7 +336,7 @@ For each "page" of content:
 Close the document with doc->close().
 ```
 
-Here is an concrete example of using Skia’s PDF backend (SkPDF) via the SkDocument and SkCanvas APIs.
+Here are two concrete example of using Skia’s PDF backend (SkPDF) via the SkDocument and SkCanvas APIs.
 
 ```cpp
 void WritePDF(SkWStream* outputStream, const char* documentTitle, void (*writePage)(SkCanvas*, int page), int numberOfPages, SkSize pageSize) {
@@ -357,6 +389,18 @@ void draw(SkCanvas*) {
     WritePDF(&buffer, "SkPDF Example", &write_page, 1, ansiLetterSize);
     sk_sp<SkData> pdfData = buffer.detachAsData();
     print_data(pdfData.get(), "skpdf_example.pdf");
+}
+```
+
+```cpp
+#include "include/docs/SkPDFDocument.h"
+#include "include/core/SkStream.h"
+void skpdf(int width, int height, void (*draw)(SkCanvas*), const char* path) {
+    SkFILEWStream pdfStream(path);
+    auto pdfDoc = SkPDF::MakeDocument(&pdfStream);
+    SkCanvas* pdfCanvas = pdfDoc->beginPage(SkIntToScalar(width), SkIntToScalar(height));
+    draw(pdfCanvas);
+    pdfDoc->close();
 }
 ```
 
