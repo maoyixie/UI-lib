@@ -406,6 +406,14 @@ void skpdf(int width, int height, void (*draw)(SkCanvas*), const char* path) {
 }
 ```
 
+### SkXPS
+
+The SkXPS(still experimental) canvas writes into an XPS document. Little information. TODO...
+
+### SkSVG
+
+The SkSVG(still experimental) canvas writes into an SVG document. Little information. TODO...
+
 ### SkPicture
 
 The SkPicture backend uses SkPictureRecorder instead of SkSurface. TODO...
@@ -413,14 +421,6 @@ The SkPicture backend uses SkPictureRecorder instead of SkSurface. TODO...
 ### NullCanvas
 
 The NullCanvas is a canvas that ignores all drawing commands and does nothing. TODO...
-
-### SkXPS
-
-The SkXPS(still experimental) canvas writes into an XPS document. TODO...
-
-### SkSVG
-
-The SkSVG(still experimental) canvas writes into an SVG document. TODO...
 
 ## SkSL
 
