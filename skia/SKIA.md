@@ -447,7 +447,7 @@ void picture(int width, int height, void (*draw)(SkCanvas*), const char* path) {
 
 The NullCanvas is a canvas that ignores all drawing commands and does nothing. It is useful for performance testing. Here is an example:
 
-````cpp
+```cpp
 #include "include/utils/SkNullCanvas.h"
 void null_canvas_example(int, int, void (*draw)(SkCanvas*), const char*) {
     std::unique_ptr<SkCanvas> nullCanvas = SkMakeNullCanvas();
@@ -510,4 +510,4 @@ void draw(SkCanvas* canvas) {
     auto text = SkTextBlob::MakeFromString("Hello, Skia!", SkFont(nullptr, 18));
     canvas->drawTextBlob(text.get(), 50, 25, paint2);
 }
-````
+```
