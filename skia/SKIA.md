@@ -41,6 +41,43 @@ void draw(SkCanvas* canvas) {
 }
 ```
 
+Another slightly more complex example that illustrates the entire process:
+
+```cpp
+void draw(SkCanvas* canvas) {
+  // Make a very wide-gamut offscreen surface:
+  auto rec2020 = SkColorSpace::MakeRGB(SkNamedTransferFn::kLinear, SkNamedGamut::kRec2020);
+  auto info = SkImageInfo::Make(128, 64, kRGBA_F16_SkColorType, kPremul_SkAlphaType, rec2020);
+  auto surface = SkSurface::MakeRaster(info);
+
+  // Effect draws horizontal gradients. Top half uses the simple uniform,
+  // bottom half uses a uniform tagged as a color:
+  const char* sksl = R"(
+                  uniform vec4 not_a_color;
+    layout(color) uniform vec4 color;
+
+    vec4 main(vec2 xy) {
+      vec4 c = xy.y < 32 ? not_a_color : color;
+      return (c * (xy.x / 128)).rgb1;
+    })";
+
+  auto [effect, err] = SkRuntimeEffect::MakeForShader(SkString(sksl));
+
+  // Set both uniforms to be "red":
+  SkRuntimeShaderBuilder builder(effect);
+  builder.uniform("not_a_color") = SkV4{ 1, 0, 0, 1 };  // Red?
+  builder.uniform("color")       = SkV4{ 1, 0, 0, 1 };  // sRGB Red
+
+  // Fill the offscreen surface:
+  SkPaint paint;
+  paint.setShader(builder.makeShader());
+  surface->getCanvas()->drawPaint(paint);
+
+  // Draw our offscreen image back to the original canvas:
+  canvas->drawImage(surface->makeImageSnapshot(), 0, 0);
+}
+```
+
 # MODULE/CLASS
 
 ## SkPath
@@ -455,13 +492,9 @@ void null_canvas_example(int, int, void (*draw)(SkCanvas*), const char*) {
 }
 ```
 
-## SkSL
+## SkSL && Runtime Effects
 
-Shading language. TODO...
-
-## Runtime Effects
-
-TODO...
+SkSL is Skia’s shading language. SkRuntimeEffect is a Skia C++ object that can be used to create SkShader, SkColorFilter, and SkBlender objects with behavior controlled by SkSL code. This API is experimental and subject to change.
 
 # MODEL
 
