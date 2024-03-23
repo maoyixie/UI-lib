@@ -5,11 +5,11 @@ In this document, targeting cpp APIs, I would introduce how to use Skia based on
 The fundamental workflow is that:
 
 ```
-determine backends => get/create canvas => (initialize) => set parameters => draw
+determine backends => get canvas => (initialize) => set parameters => draw
 ```
 
-- Determine [backends](#backends): TODO...
-- Get/Create [canvas](#skcanvas): TODO...
+- Determine [backends](#backends): You can call surface = SkSurface::MakeRaster(...);, etc.
+- Get [canvas](#skcanvas): You can call canvas = surface->getCanvas();, etc.
 - Initialize: You can call canvas->save(), canvas->clear(SkColor) or canvas->drawColor(Sk_ColorWHITE) to initialize the canvas. Do remember to call canvas->restore() at the end if you call canvas->save() at the beginning. You can also do nothing.
 - Set parameters:
   - Define graphic: You can use SkPath or SkXXX (e.g. SkRect).
