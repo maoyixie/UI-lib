@@ -494,7 +494,87 @@ void null_canvas_example(int, int, void (*draw)(SkCanvas*), const char*) {
 
 ## SkSL && Runtime Effects
 
-SkSL is Skia’s shading language. SkRuntimeEffect is a Skia C++ object that can be used to create SkShader, SkColorFilter, and SkBlender objects with behavior controlled by SkSL code. This API is experimental and subject to change.
+SkSL is Skia’s shading language. SkRuntimeEffect is a Skia C++ object that can be used to create SkShader, SkColorFilter, and SkBlender objects with behavior controlled by SkSL code. This API is experimental and subject to change. Here are two concrete examples:
+
+```cpp
+void draw(SkCanvas* canvas) {
+  const char* sksl =
+    "uniform shader image;"
+    "half4 main(float2 coord) {"
+    "  coord.x += sin(coord.y / 3) * 4;"  // Displace each row by up to 4 pixels
+    "  return image.eval(coord);"
+    "}";
+
+  // Draw the SkSL shader, with an image shader bound to `image`: // SK_FOLD_START
+
+  // Turn `image` into an SkShader:
+  sk_sp<SkShader> imageShader = image->makeShader(SkSamplingOptions(SkFilterMode::kLinear));
+
+  // Parse the SkSL, and create an SkRuntimeEffect object:
+  auto [effect, err] = SkRuntimeEffect::MakeForShader(SkString(sksl));
+
+  // SkRuntimeEffect::makeShader expects an SkSpan<ChildPtr>, one per `uniform shader`:
+  SkRuntimeEffect::ChildPtr children[] = { imageShader };
+
+  // Create an SkShader from our SkSL, with `imageShader` bound to `image`:
+  sk_sp<SkShader> myShader = effect->makeShader(/*uniforms=*/ nullptr,
+                                                /*children=*/ { children, 1 });
+
+  // Fill the surface with `myShader`:
+  SkPaint p;
+  p.setShader(myShader);
+  canvas->drawPaint(p);
+  // SK_FOLD_END
+}
+```
+
+```cpp
+void draw(SkCanvas* canvas) {
+  // Make a hemispherical normal map image:
+  auto imageInfo = SkImageInfo::MakeN32Premul(128, 128);
+  auto normalImage = SkRuntimeEffect::MakeForShader(SkString(R"(
+    vec4 main(vec2 p) {
+      p = (p / 128) * 2 - 1;
+      float len2 = dot(p, p);
+      vec3 v = (len2 > 1) ? vec3(0, 0, 1) : vec3(p, sqrt(1 - len2));
+      return (v * 0.5 + 0.5).xyz1;
+    })")).effect->makeImage(nullptr, nullptr, {}, nullptr, imageInfo, false);
+
+  // Make a simple lighting effect:
+  auto litEffect = SkRuntimeEffect::MakeForShader(SkString(R"(
+    uniform shader normals;
+    vec4 main(vec2 p) {
+      vec3 n = normalize(normals.eval(p).xyz * 2 - 1);
+      vec3 l = normalize(vec3(-1, -1, 0.5));
+      return saturate(dot(n, l)).xxx1;
+    })")).effect;
+  SkRuntimeShaderBuilder builder(litEffect);
+  SkPaint paint;
+
+  // FIRST: Draw the lighting to our (not color managed) canvas.
+  // This is our CORRECT, reference result:
+  builder.child("normals") = normalImage->makeShader(SkSamplingOptions{});
+  paint.setShader(builder.makeShader());
+  canvas->drawRect({0,0,128,128}, paint);
+
+  // Make an offscreen surface with a wide gamut:
+  auto rec2020 = SkColorSpace::MakeRGB(SkNamedTransferFn::kSRGB, SkNamedGamut::kRec2020);
+  auto info = SkImageInfo::Make(128, 128, kRGBA_F16_SkColorType, kPremul_SkAlphaType, rec2020);
+  auto surface = SkSurface::MakeRaster(info);
+
+  // SECOND: Draw the lighting to the offscreen surface. Color management
+  // changes the normals, producing INCORRECT (wrong direction) lighting:
+  surface->getCanvas()->drawPaint(paint);
+  canvas->drawImage(surface->makeImageSnapshot(), 128, 0);
+
+  // THIRD: Convert the normals to a raw image shader. This ignores color
+  // management for that image, so we get CORRECT lighting again:
+  builder.child("normals") = normalImage->makeRawShader(SkSamplingOptions{});
+  paint.setShader(builder.makeShader());
+  surface->getCanvas()->drawPaint(paint);
+  canvas->drawImage(surface->makeImageSnapshot(), 256, 0);
+}
+```
 
 # MODEL
 
