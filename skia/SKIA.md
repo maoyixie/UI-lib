@@ -12,9 +12,9 @@ determine backends => get canvas => (initialize) => set parameters => draw
 - Get [canvas](#skcanvas): You can call canvas = surface->getCanvas();, etc.
 - Initialize: You can call canvas->save(), canvas->clear(SkColor) or canvas->drawColor(Sk_ColorWHITE) to initialize the canvas. Do remember to call canvas->restore() at the end if you call canvas->save() at the beginning. You can also do nothing.
 - Set parameters:
-  - Define graphic: You can use SkPath or SkXXX (e.g. SkRect).
+  - (Define graphic): You can use SkPath or SkXXX (e.g. SkRect). You can also do nothing.
   - Configure other parameters: You can use SkPaint. There are a lot of other settings.
-- Draw: You can call canvas->drawPath() or canvas->drawXXX().
+- Draw: You can call canvas->drawPath(...), canvas->drawXXX(...) or canvas->drawPaint(...).
 
 Here are two simple examples:
 
